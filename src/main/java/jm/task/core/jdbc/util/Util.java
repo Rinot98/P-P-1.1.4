@@ -20,10 +20,6 @@ public class Util {
     private SessionFactory sessionFactory;
     Logger logger = LoggerFactory.getLogger(Util.class);
 
-    public Util() {
-
-    }
-
     public SessionFactory getSessionFactory() {
         if (sessionFactory == null) {
             try {

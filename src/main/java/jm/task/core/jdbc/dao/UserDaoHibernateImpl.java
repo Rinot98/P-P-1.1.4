@@ -4,7 +4,6 @@ import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,55 +12,35 @@ import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
 
-    private final Logger logger = LoggerFactory.getLogger(UserDaoHibernateImpl.class);
+    private final static Logger logger = LoggerFactory.getLogger(UserDaoHibernateImpl.class);
 
-    private final SessionFactory factory;
+    private final static SessionFactory factory = new Util().getSessionFactory();
 
-    private final String T_CREATE = "CREATE TABLE users (" +
+    private final static String T_CREATE = "CREATE TABLE users (" +
             "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
             "name VARCHAR(255) NOT NULL, " +
             "lastName VARCHAR(255) NOT NULL, " +
             "age TINYINT NOT NULL" +
             ");";
 
-    public UserDaoHibernateImpl() {
-//        factory = new Configuration()
-//                .configure("hibernate.cfg.xml")
-//                .addAnnotatedClass(User.class)
-//                .buildSessionFactory();
-        Util util = new Util();
-        this.factory = util.getSessionFactory();
-    }
-
-
     @Override
     public void createUsersTable() {
-        Session session = null;
-        try {
-            session = factory.getCurrentSession();
+        try (Session session = factory.getCurrentSession()) {
             session.beginTransaction();
             session.createNativeQuery(T_CREATE).executeUpdate();
             session.getTransaction().commit();
         } catch (Exception e) {
-            if (session.getTransaction() != null) {
-                session.getTransaction().rollback();
-            }
             logger.error("Ошибка при создании таблицы 'users': {}", e.getMessage(), e);
         }
     }
 
     @Override
     public void dropUsersTable() {
-        Session session = null;
-        try {
-            session = factory.getCurrentSession();
+        try (Session session = factory.getCurrentSession()) {
             session.beginTransaction();
             session.createNativeQuery("DROP TABLE  if exists Users").executeUpdate();
             session.getTransaction().commit();
         } catch (Exception e) {
-            if (session.getTransaction() != null) {
-                session.getTransaction().rollback();
-            }
             logger.error("Ошибка при удалении таблица 'users': {}", e.getMessage(), e);
         }
     }
@@ -92,9 +71,7 @@ public class UserDaoHibernateImpl implements UserDao {
                     .executeUpdate();
             session.getTransaction().commit();
         } catch (Exception e) {
-            if (session.getTransaction() != null) {
-                session.getTransaction().rollback();
-            }
+            session.getTransaction().rollback();
             logger.error("Ошибка при удалении пользователя с id = {}: {}", id, e.getMessage(), e);
         }
     }
@@ -111,9 +88,7 @@ public class UserDaoHibernateImpl implements UserDao {
             session.getTransaction().commit();
             users.forEach(System.out::println);
         } catch (Exception e) {
-            if (session.getTransaction() != null) {
-                session.getTransaction().rollback();
-            }
+            session.getTransaction().rollback();
             logger.error("Ошибка при получении пользователей из БД! : {}", e.getMessage(), e);
         }
         return users;
@@ -128,9 +103,7 @@ public class UserDaoHibernateImpl implements UserDao {
             session.createQuery("delete from User").executeUpdate();
             session.getTransaction().commit();
         } catch (Exception e) {
-            if (session.getTransaction() != null) {
-                session.getTransaction().rollback();
-            }
+            session.getTransaction().rollback();
             logger.error("Ошибка при удалении записей таблицы 'users': {}", e.getMessage(), e);
         }
     }
