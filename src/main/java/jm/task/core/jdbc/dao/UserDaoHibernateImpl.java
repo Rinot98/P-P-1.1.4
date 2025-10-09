@@ -2,7 +2,6 @@ package jm.task.core.jdbc.dao;
 
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -55,13 +54,11 @@ public class UserDaoHibernateImpl implements UserDao {
             User user = new User(name, lastName, age);
             session.save(user);
             tr.commit();
-        } catch (HibernateException he) {
+        } catch (Exception e) {
             if (tr != null) {
                 tr.rollback();
             }
-            logger.error("Ошибка транзакции при создании пользователя: {}", he.getMessage(), he);
-        } catch (Exception e) {
-            logger.error("Неизвестная ошибка при создании пользователя {} {}: {}", name, lastName, e.getMessage(), e);
+            logger.error("Ошибка транзакции при создании пользователя: {}", e.getMessage(),e);
         }
     }
 
@@ -74,13 +71,11 @@ public class UserDaoHibernateImpl implements UserDao {
                     .setParameter("userId", id)
                     .executeUpdate();
             tr.commit();
-        } catch (HibernateException he) {
+        } catch (Exception e) {
             if (tr != null) {
                 tr.rollback();
             }
-            logger.error("Ошибка транзакции при удалении пользователя: {}", he.getMessage(), he);
-        } catch (Exception e) {
-            logger.error("Ошибка при удалении пользователя с id = {}: {}", id, e.getMessage(), e);
+            logger.error("Ошибка транзакции при удалении пользователя: {}",e.getMessage(),e);
         }
     }
 
@@ -93,13 +88,11 @@ public class UserDaoHibernateImpl implements UserDao {
             users = session.createQuery("from User", User.class)
                     .getResultList();
             tr.commit();
-        } catch (HibernateException he) {
+        } catch (Exception e) {
             if (tr != null) {
                 tr.rollback();
             }
-            logger.error("Ошибка транзакции при получении пользователей: {}", he.getMessage(), he);
-        } catch (Exception e) {
-            logger.error("Ошибка при получении пользователей из БД! : {}", e.getMessage(), e);
+            logger.error("Ошибка транзакции при получении пользователей: {}",e.getMessage(),e);
         }
         return users;
     }
@@ -111,13 +104,11 @@ public class UserDaoHibernateImpl implements UserDao {
             tr = session.beginTransaction();
             session.createQuery("delete from User").executeUpdate();
             tr.commit();
-        } catch (HibernateException he) {
+        } catch (Exception e) {
             if (tr != null) {
                 tr.rollback();
             }
-            logger.error("Ошибка транзакции при удалении записей таблицы: {}", he.getMessage(), he);
-        } catch (Exception e) {
-            logger.error("Ошибка при удалении записей таблицы 'users': {}", e.getMessage(), e);
+            logger.error("Ошибка транзакции при удалении записей таблицы: {}",e.getMessage(),e);
         }
     }
 
